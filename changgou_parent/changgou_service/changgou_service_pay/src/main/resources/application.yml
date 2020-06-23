@@ -1,0 +1,31 @@
+server:
+  port: 9010
+spring:
+  application:
+    name: pay
+  rabbitmq:
+    host: 192.168.200.128
+  main:
+    allow-bean-definition-overriding: true #当遇到同样名字的时候，是否允许覆盖注册
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:6868/eureka
+  instance:
+    prefer-ip-address: true
+    ip-address: localhost
+wxpay:
+  notify_url: http://panhaoxiang.cross.echosite.cn/wxpay/notify #回调地址
+alipay:
+  notify_url: http://panhaoxiang.cross.echosite.cn/alipay/notify #回调地址
+aLipay:
+  #支付宝网关
+  serverUrl: https://openapi.alipaydev.com/gateway.do
+  #应用Id
+  appId: 2016103000778561
+  #商户私钥
+  privateKey: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDR3hv7uYhBUDxcY8mV3EaSLSQGL44v92mnhb/o9w31AJc1oByaNTAxZYuvpBB3ROantgWBy5TjKh83dAbaSM9VRhjpjsGwRjiCshZ0kLvQo/5U246xWsGStkZGPlUzHvt3thEu2MVRhT47n8oyws4cBCaEi9i9KIqrS1NjjrhZ7hNhxmPlU+4orAwYlSVwOJgfeqHZXzosDBdPcTl9ysEaI08FFWMDvNPG5fq6S6VKB+hN9dp0V4+Q+LV+BN0Cf5o3yTujGK7OWeXkOhWVir4mywrQ/zJiQU3Bv4POKWseqZfUtO0ODMydnqiN3GKtX0oUK3RH361jaQUdd9haJJhTAgMBAAECggEAXAsEzN8vMi4FeyPMuqw0S1H+9bOPsdvZ+73+UCdieKy8pKlHQh7HtzJpFCxpiFWwr6d2PNnTv9mufTym8L90J1sp++0/Z5c0m6WNkawUo0n5drAgogpC0Zydr5sQ9O3GrlcsrBYoXDuK8s1++cpUaRcs6X8IHNYWE1BjD0v98HpdPZ4nat+c2B+rMn+dDBR8xYvh8bMX09bXTWxrsuqxO5A1ytS17XsplHCjUhT4/+7vN/PG/LgT0AGrZy2LeV7zDf0QFi9IciMrP9c/ViFGh38oYvVSBsn2Zeo6ZEw88YFeBryMnSWG7V1KXjHUbDkxpa9IhLvzxa11HJlh3oMYQQKBgQD4Iif7CCdrXdbpfpMvs0I7qsoWU+lQ60sRBkormhGIJCAzXXvCGw8AhqT18oaw0NVdotVQSJZGY6uNQbm54FXHTQNM7zs2mcTcYJaYZfzWAM/CbsRTXP0iCLcLsuhVIw/1LNKXxCKdsACHkrUtSjDoFQKzNvnMiG36cZnpKg694QKBgQDYhWOQX35mYgQfgnFUvyYJ/73CBiaIFV1JwliSyiGx0fRh5B/TPy/sEW40HLC8iE2v+E+ev9xkfhRGyUZ0nGtasEYtO6jTkJAt/saUQBIJvKNZiWBwYgKLwQH7hHYYZhVsHIKDhCmCC3YkFcpxEcv+YN+KcTMusVczBHJdvIhUswKBgQClIC3VC8cX1zn25unSO4vfIzgbBbplxD+PU802GPCD1e6r4BFEyjcAlZnfpobl0gO7rWohZDzFGP0IIu4S+Wx8Fg8VOrsACfKM6aYuQuiwDZg0/vudsmsuI/iUS3n7djrfYPXAU6DpqT+g+Qui2RWUzK6gTvyLlVsC6GiRVxC6YQKBgB+eCtXwO+LzeSqov6fiacmYALuubj388KxupsR4o8b1o7wPtd4BIhxUx0Tw05YUSVPi7K1/0s0R5CAaECHDHaIWj4jXZ2XNfGBbDeBkIr4tP6U5fE2s4jZKLuHti9kwPvyUhTJzQCRvTAck73TnZmR0/O+YbCLrXpJimdi6SSYlAoGAR0zb8tOY37IY23ypNmxp80RsFbxEATYa0Zk8Pl5Balvb4cOrZZGXe9GLXiF6Cz+nl/GRCPVY53F68nSzlqvLhIqTnMol3HuEiV/TM7UFFIjzzDhyuplIlZYfFs4YK/wUIOFGRnJ4CYHibUFjNSZDEU9MxLPJiqpXIRiBvl54Bvg=
+  #支付宝公钥
+  aLipayPublicKey: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAgmkINoLL9SkYzdxrhW0dYGY8xGWDMYifVxEBOO/9QINFFzCOZTy49fsr6jIKxo7QK3b8mT0VwfwCnHnr2NVZTlDNxSG6WnCbeX7hx9D2eZo3N4W4vsaL5JUClaSkJkO2IOgQVNLJ7A6wRvZoJ0N4EQeEChb2WTeTl6IktFL1kCYb1kdSQDkYDlsMZJVtuS//VeGVSnPoDO2FYY8AwnTr0R32XOmzCCBmPeu+H1SA316tNro7mIUTQ91I+yyzQqu43kkcbJcXffyTDTZQ4V+xH0z9ti9ZJuhyIx4q4ccoIS6ZjZ1fWzeTAQFjNH3tNvgUspzSHJv4pgrkN8ZvvbCU9QIDAQAB
+
+  

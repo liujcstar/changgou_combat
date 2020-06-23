@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html style="height: 100%" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>订单统计</title>
+
+
+
+    <!--引入样式-->
+    <link rel="stylesheet" href="/plugins/elementui/index.css">
+    <link rel="stylesheet" href="/plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- 引入组件库 -->
+    <script type="text/javascript" src="/js/plugins/jquery/jquery.min.js"></script>
+    <script src="/js/vue.js"></script>
+    <script src="/plugins/elementui/index.js"></script>
+    <script src="/js/axios.js"></script>
+    <script src="/plugins/echarts/echarts.js"></script>
+
+</head>
+
+<div id="app">
+    <div class="content-header">
+        <form>
+            <div class="container">
+                <span class="demonstration">请先选择指定日期</span>
+
+                <el-date-picker
+                        v-model="date"
+                        type="daterange"
+                        range-separator="至"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期"
+                        :picker-options="pickerOptions">
+                </el-date-picker>
+
+                <el-button type="primary" icon="el-icon-search" @click="search()">查询</el-button> &nbsp;
+                <el-button type="success"  @click="go()">更多</el-button>
+            </div>
+
+        </form>
+        <el-breadcrumb separator-class="el-icon-arrow-right" class="breadcrumb">
+            <el-breadcrumb-item>统计分析</el-breadcrumb-item>
+            <el-breadcrumb-item>品优购订单统计情况</el-breadcrumb-item>
+        </el-breadcrumb>
+    </div>
+    <div class="app-container">
+        <div class="box">
+            <!-- 为 ECharts 准备一个具备大小（宽高）的 DOM -->
+            <div id="chart1" style="height:700px"></div>
+        </div>
+    </div>
+</div>
+
+<body style="height: 100%; margin: 0">
+
+<script type="text/javascript">
+
+    var vue = new Vue({
+        el: '#app',
+        data: {
+            vue: this,
+            date: "",
+            timeOptionRange: '',
+            pickerOptions: {
+                onPick(time) {
+                    //当第一时间选中才设置禁用
+                    if (time.minDate && !time.maxDate) {
+                        vue.timeOptionRange = time.minDate;
+                    }
+                    if (time.maxDate) {
+                        vue.timeOptionRange = null;
+                    }
+                }
+            }
+
+        },
+        mounted(){
+            this.search();
+        },
+
+        methods:{
+
+            search() {
+                // alert("111");
+                // 基于准备好的dom，初始化echarts实例
+                var myChart1 = echarts.init(document.getElementById('chart1'));
+
+                // 使用刚指定的配置项和数据显示图表。
+                //myChart.setOption(option);
+
+                axios.get("/api/worder/lookOrderStatus").then((res) => {
+
+
+                    myChart1.setOption({
+                        title: {
+                            text: '品优购订单统计情况',
+                            subtext: '黑马程序员  合肥中心',
+                            left: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: '{a} <br/>{b} : {c} ({d}%)'
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            // data: ['待付款订单', '待发货订单', '已发货订单', '已完成订单', '已关闭订单','已评价订单']
+                            data: res.data.data.setmealNames
+                        },
+                        series: [
+                            {
+                                name: '订单状态统计',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                // selectedMode: 'single',
+                                // data: [
+                                //     {value: 20, name: '待付款订单'},
+                                //     {value: 20, name: '待发货订单'},
+                                //     {value: 15, name: '已发货订单'},
+                                //     {value: 10, name: '已完成订单'},
+                                //     {value: 100, name: '已关闭订单'},
+                                //     {value: 100, name: '已评价订单'}
+                                // ],
+                                data: res.data.data.setmealCount,
+                                emphasis: {
+                                    itemStyle: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                    }
+                                }
+                            },
+                        ]
+                    });
+                });
+            },
+
+            go(){
+                location.href="http://localhost:8001/api/worder/showChart"
+            },
+
+            search2() {
+                // alert("111");
+                // 基于准备好的dom，初始化echarts实例
+                var myChart1 = echarts.init(document.getElementById('chart1'));
+
+                // 使用刚指定的配置项和数据显示图表。
+                //myChart.setOption(option);
+
+                axios.get("/api/worder/lookOrderStatus3?date="+vue.date).then((res) => {
+
+
+                    myChart1.setOption({
+                        title: {
+                            text: '品优购订单统计情况',
+                            subtext: '黑马程序员  合肥中心',
+                            left: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: '{a} <br/>{b} : {c} ({d}%)'
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            // data: ['待付款订单', '待发货订单', '已发货订单', '已完成订单', '已关闭订单','已评价订单']
+                            data: res.data.data.setmealNames
+                        },
+                        series: [
+                            {
+                                name: '订单状态统计',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                label: {
+                                    formatter: '{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ',
+                                    backgroundColor: '#eee',
+                                    borderColor: '#aaa',
+                                    borderWidth: 1,
+                                    borderRadius: 4,
+                                    rich: {
+                                        a: {
+                                            color: '#999',
+                                            lineHeight: 22,
+                                            align: 'center'
+                                        },
+                                        hr: {
+                                            borderColor: '#aaa',
+                                            width: '100%',
+                                            borderWidth: 0.5,
+                                            height: 0
+                                        },
+                                        b: {
+                                            fontSize: 16,
+                                            lineHeight: 33
+                                        },
+                                        per: {
+                                            color: '#eee',
+                                            backgroundColor: '#334455',
+                                            padding: [2, 4],
+                                            borderRadius: 2
+                                        }
+                                    }
+                                },
+                                // selectedMode: 'single',
+                                // data: [
+                                //     {value: 20, name: '待付款订单'},
+                                //     {value: 20, name: '待发货订单'},
+                                //     {value: 15, name: '已发货订单'},
+                                //     {value: 10, name: '已完成订单'},
+                                //     {value: 100, name: '已关闭订单'},
+                                //     {value: 100, name: '已评价订单'}
+                                // ],
+                                data: res.data.data.setmealCount,
+                                // emphasis: {
+                                //     itemStyle: {
+                                //         shadowBlur: 10,
+                                //         shadowOffsetX: 0,
+                                //         shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                //     }
+                                // }
+                            },
+                        ]
+                    });
+                });
+            }
+
+        }
+    });
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>订单统计</title>
+    <!-- 引入 echarts.js -->
+    <script src="/plugins/echarts/echarts.js"></script>
+    <script src="/js/vue.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.2/theme-chalk/index.css" />
+    <script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.13.2/index.js"></script>
+    <script src="/js/axios.js"></script>
+
+
+
+
+</head>
+<body style="text-align: center">
+<div  id="app">
+        <h1 style="color: orangered;padding-bottom: 30px">畅购订单统计概况</h1>
+        <div style="margin: 0 auto">
+            <div class="block">
+                <el-date-picker
+                        v-model="value"
+                        type="datetimerange"
+                        start-placeholder="选择开始日期"
+                        end-placeholder="选择结束日期"
+                        :default-time="['12:00:00']">
+                </el-date-picker>
+
+                <el-button type="primary" icon="el-icon-search" @click="initEchars()">搜索</el-button>
+            </div>
+        </div >
+
+
+        <div style="margin: 0 auto">
+            <br><br><br><br>
+            <el-button type="primary" @click="initEchars()">柱状图</el-button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+            <el-button type="success"  @click="ztu()">折线图</el-button>
+        </div>
+
+       <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+       <div  id="main" style="width: 600px;height:400px;margin: 0 auto;"></div>
+
+</div>
+
+        <script>
+
+
+
+            var vue=new Vue({
+                el: '#app',
+                data(){
+                    return {
+                        value: ''
+                    }
+                },
+                mounted(){
+
+                    //初始化 默认查询当前时间前一周
+                    this.initEchars();
+                },
+                methods: {
+
+                    initEchars() {
+
+                        if(this.value==null){
+                            this.value="";
+                        }
+
+                        axios.get("/api/worder/kinggm/"+this.value).then((res) => {
+
+
+                            if (res.data.flag) {
+
+
+                                // 基于准备好的dom，初始化echarts实例
+                                var myChart = echarts.init(document.getElementById('main'));
+                                // 指定图表的配置项和数据
+                                var option = {
+
+                                    title: {},
+                                    tooltip: {},
+                                    xAxis: {
+                                        type: 'category',
+                                        // data: ["待付款订单", "待发货订单", "已发货订单", "已完成订单", "已关闭订单"]
+                                        data: res.data.data.names
+                                    },
+                                    yAxis: {
+
+                                        type: 'value'
+                                    },
+                                    series: [{
+                                        name: '数量',
+                                        type: 'bar',
+                                        itemStyle: {
+                                            normal: {
+                                                color: function (params) {
+                                                    var colorList = [
+                                                        "#2ec7c9",
+                                                        "#b6a2de",
+                                                        "#5ab1ef",
+                                                        "#ffb980",
+                                                        "#8d98b3",
+                                                    ]
+                                                    return colorList[params.dataIndex]
+                                                }
+                                            }
+                                        },
+                                        barWidth: '60%',
+
+                                        // data: [5, 20, 36, 10, 10],
+                                       data: res.data.data.values
+
+                                    }]
+                                };
+                                // 使用刚指定的配置项和数据显示图表。
+                                myChart.setOption(option);
+
+
+                            }else {
+                                this.$message({
+                                    showClose: true,
+                                    message: '获取数据失败',
+                                    type: 'error'
+                                });
+                            }
+
+                        })
+                    },
+
+
+             ztu(){
+
+                 if(this.value==null){
+                     this.value="";
+                 }
+
+                 axios.get("/api/worder/kinggm/"+this.value).then((res) => {
+
+
+                     if (res.data.flag) {
+
+
+                         // 基于准备好的dom，初始化echarts实例
+                         var myChart = echarts.init(document.getElementById('main'));
+                         // 指定图表的配置项和数据
+
+                         option = {
+                             xAxis: {
+                                 type: 'category',
+                                 // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                                 data: res.data.data.names
+                             },
+                             yAxis: {
+                                 type: 'value'
+                             },
+                             series: [{
+                                 // data: [820, 932, 901, 934, 1290, 1330, 1320],
+                                 data: res.data.data.values,
+                                 type: 'line',
+                                 itemStyle: {
+                                     normal: {
+                                         color: function (params) {
+                                             var colorList = [
+                                                 "#2ec7c9",
+                                                 "#b6a2de",
+                                                 "#5ab1ef",
+                                                 "#ffb980",
+                                                 "#8d98b3",
+                                             ]
+                                             return colorList[params.dataIndex]
+                                         }
+                                     }
+                                 }
+                             }]
+                         };
+
+
+                         // 使用刚指定的配置项和数据显示图表。
+                         myChart.setOption(option);
+
+
+                     }else {
+                         this.$message({
+                             showClose: true,
+                             message: '获取数据失败',
+                             type: 'error'
+                         });
+                     }
+
+                 })
+
+
+             },
+
+
+                }
+
+            });
+
+
+        </script>
+
+
+</body>
+</html>

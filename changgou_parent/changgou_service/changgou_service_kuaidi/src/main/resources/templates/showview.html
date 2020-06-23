@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh_CN" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>快递查询</title>
+    <link rel="stylesheet" type="text/css" href="/css/kuaidi.css"/>
+    <link rel="stylesheet" type="text/css" href="/plugins/elementui/index.css"/>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/vue.js"></script>
+    <script src="/js/axios.js"></script>
+    <script src="/plugins/elementui/index.js"></script>
+
+</head>
+<body style="padding-left: 20px;padding-right: 20px;padding-top: 20px">
+<div class="package-status" id="app">
+
+
+    <h1 style="text-align: center;color: orangered">快递查询</h1>
+    <div style="text-align: center">
+
+        <form :model="formData" method="get" action="#">
+            <label>快递公司：</label>
+            <select id="sel" style="height: 40px;width: 200px;font-size: 15px;border-radius: 5px;border: 1px solid orangered;outline: none"onchange="func()"
+                    v-model="formData.com">
+                <option v-for="(value,key) in company" v-bind:value=key>{{value}}</option>
+            </select>
+            <label>快递单号：</label><input type="text" style="height: 40px;width: 200px;border-radius: 5px;border: 1px solid orangered; outline: none"
+                                       v-model="formData.no">
+            <span id="sp">
+            <label>收件人手机号：</label><input type="text" style="height: 40px;width: 200px;border-radius: 5px;border: 1px solid orangered;outline: none"
+                                         v-model="formData.receiverPhone" placeholder=" 顺丰快递此项为必填">
+            </span>
+            <button type="button" style="background-color: orangered;color: white;height: 50px;width: 80px;border-radius: 5px;outline: none;border: 1px solid orangered"
+                    @click="handleEdit()">查询
+            </button>
+        </form>
+
+        <div>
+            <br><br><br>
+            <div class="status-box">
+                <ul class="status-list" v-for="(item,index) in list">
+
+                    <li v-if="index==0" class="latest">
+                        <div class="status-content-latest">{{item.remark}}</div>
+                        <div class="status-time-latest">{{item.datetime}}</div>
+                        <div class="status-line"></div>
+                    </li>
+
+                    <li v-if="index!=0">
+                        <div class="status-content-before">{{item.remark}}</div>
+                        <div class="status-time-before">{{item.datetime}}</div>
+                        <div class="status-line"></div>
+                    </li>
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+
+<script>
+
+
+    var vue = new Vue({
+        el: '#app',
+        data: {
+            //快递公司数据
+            company: {
+                sf: "顺丰快递",
+                sto: "申通快递",
+                yt: "圆通快递",
+                yd: "韵达快递",
+                tt: "天天快递",
+                zto: "中通快递",
+                ems: "邮政快递",
+                qf: "全峰快递",
+                ht: "百世快递",
+                zjs: "宅急送快递"
+            },
+
+
+            formData: {
+                com: "",
+                no: "",
+                receiverPhone: ""
+            },//表单数据
+
+            list: []
+
+        },
+//钩子函数，VUE对象初始化完成后自动执行
+        created() {
+
+        },
+
+        mounted() {
+
+        }
+        ,
+        methods: {
+            handleEdit() {
+
+                if (this.formData.com == null || this.formData.com.trim().length <= 0) {
+                    this.$message({
+                        showClose: true,
+                        message: '请选择快递公司',
+                        type: 'error'
+                    });
+
+                    return;
+                }
+
+                if (this.formData.no == null || this.formData.no.trim().length <= 0) {
+                    this.$message({
+                        showClose: true,
+                        message: '请填写快递单号',
+                        type: 'error'
+                    });
+
+                    return;
+                }
+
+
+                if (this.formData.com == "sf") {
+
+                    if (this.formData.receiverPhone == null || this.formData.receiverPhone.trim().length <= 0) {
+                        this.$message({
+                            showClose: true,
+                            message: '请填写收件人手机号',
+                            type: 'error'
+                        });
+                        return;
+                    }
+
+
+                }
+
+
+                axios.get("/api/kuaidi/find" + "/" + this.formData.com + "/" + this.formData.no + "/" + this.formData.receiverPhone).then((res) => {
+                    //解析Controller返回的数据，为模型数据赋值
+
+
+                    if (res.data.flag) {
+                        this.$message({
+                            showClose: true,
+                            message: '查询成功',
+                            type: 'success'
+                        });
+
+
+                        this.list = res.data.data;
+
+                    } else {
+                        this.$message({
+                            showClose: true,
+                            message: '查询失败',
+                            type: 'error'
+                        });
+                    }
+
+                });
+
+            }
+
+        }
+    });
+
+
+    function func() {
+//获取被选中的option标签
+        var vs = $('select  option:selected').val();
+        if (vs == "sf") {
+            $("#sp").show();//显示
+        } else {
+            $("#sp").hide();//隐藏
+        }
+
+    }
+</script>
+
+
+</html>

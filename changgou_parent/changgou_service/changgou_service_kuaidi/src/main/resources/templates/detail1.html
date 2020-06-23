@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=9; IE=8; IE=7; IE=EDGE">
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+	<title>物流详情</title>
+	<link rel="icon" href="../static/img/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="/css/pages-register.css" />
+
+	<link rel="stylesheet" type="text/css" href="/css/kuaidi.css"/>
+	<link rel="stylesheet" type="text/css" href="/plugins/elementui/index.css"/>
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/vue.js"></script>
+	<script src="/js/axios.js"></script>
+	<script src="/plugins/elementui/index.js"></script>
+
+</head>
+
+<body>
+<div>
+
+
+	<!--页面顶部-->
+<div id="nav-bottom">
+	<!--顶部-->
+	<div class="nav-top">
+		<div class="top">
+			<div class="py-container">
+				<div class="shortcut">
+					<ul class="fl">
+						<li class="f-item">畅购欢迎您！</li>
+					</ul>
+					<div class="fr typelist">
+						<ul class="types">
+							<li class="f-item"><span>我的订单</span></li>
+							
+							<li class="f-item"><span><a href="cart.html" target="_blank">我的购物车</a></span></li>
+							<li class="f-item"><span><a href="home.html" target="_blank">我的畅购</a></span></li>			
+							<li class="f-item"><span>畅购会员</span></li>						
+							<li class="f-item"><span>企业采购</span></li>						
+							<li class="f-item"><span>关注畅购</span></li>
+							<li class="f-item"><span><a href="cooperation.html" target="_blank">合作招商</a></span></li>
+							<li class="f-item"><span><a href="shoplogin.html" target="_blank">商家后台</a></span></li>				
+							<li class="f-item"><span>网站导航</span></li>
+						</ul>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+
+		<!--头部-->
+		<div class="header">
+			<div class="py-container">
+				<div class="yui3-g Logo">
+					<div style="padding-top: 20px" class="yui3-u Left logoArea">
+						<span ><img src="/img/favicon.ico"><span style="color: orangered;font-size: 20px">&nbsp;畅购</span></span>
+					</div>
+					<div class="yui3-u Rit searchArea">
+						<div class="search">
+							<form action="" class="sui-form form-inline">
+								<!--searchAutoComplete-->
+								<div class="input-append">
+									<input type="text" id="autocomplete"  class="input-error input-xxlarge" />
+									<button class="sui-btn btn-xlarge btn-danger" type="button">搜索</button>
+								</div>
+							</form>
+						</div>
+					</div>
+					
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+	<div class="register py-container ">
+		
+		<!--register-->
+		<div class="registerArea">
+			<h3 >物流公司：<span style="color: orangered" th:text="${name}"></span> <span class="go">快递单号：<span style="color:orangered" th:text="${number}"></span> </span>  </h3>
+			<div class="info">
+
+				<div class="clearfix">
+					<div class="package-status" id="app">
+						<h1  style="text-align: center;color: orangered; margin-top: -30px">物流详情</h1> <br>
+
+						<div class="status-box">
+							<ul class="status-list" th:each="list,listStat:${list}">
+
+								<li th:if="${(listStat.index!=0)}">
+									<div class="status-content-before" th:text="${list.remark}"></div>
+									<div class="status-time-before" th:text="${list.datetime}"></div>
+									<div class="status-line"></div>
+								</li>
+
+								<li th:if="${(listStat.index==0)}" class="latest">
+									<div class="status-content-latest" th:text="${list.remark}"></div>
+									<div class="status-time-latest" th:text="${list.datetime}"></div>
+									<div class="status-line"></div>
+								</li>
+
+							</ul>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+		<!--foot-->
+		<div class="py-container copyright">
+			<ul>
+				<li>关于我们</li>
+				<li>联系我们</li>
+				<li>联系客服</li>
+				<li>商家入驻</li>
+				<li>营销中心</li>
+				<li>手机品优购</li>
+				<li>销售联盟</li>
+				<li>品优购社区</li>
+			</ul>
+			<div class="address">地址：北京市昌平区建材城西路金燕龙办公楼一层 邮编：100096 电话：400-618-4000 传真：010-82935100</div>
+			<div class="beian">京ICP备08001421号京公网安备110108007702
+			</div>
+		</div>
+	</div>
+
+</div>
+
+</body>
+
+<script>
+
+
+    var vue = new Vue({
+        el: '#app',
+        data: {
+            flag: [[${flag}]]
+        },
+//钩子函数，VUE对象初始化完成后自动执行
+        created() {
+            if (this.flag) {
+                this.$message({
+                    showClose: true,
+                    message: '查询成功',
+                    type: 'success'
+                });
+            } else {
+                this.$message({
+                    showClose: true,
+                    message: '查询失败',
+                    type: 'error'
+                });
+            }
+        },
+
+        mounted() {
+
+        }
+
+    });
+
+
+    function func() {
+//获取被选中的option标签
+        var vs = $('select  option:selected').val();
+        if (vs == "sf") {
+            $("#sp").show();//显示
+        } else {
+            $("#sp").hide();//隐藏
+        }
+
+    }
+</script>
+
+
+
+</html>

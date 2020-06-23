@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>客户服务客服端</title>
+    <script type="text/javascript" src="https://cdn.goeasy.io/goeasy-1.0.11.js"></script>
+    <script src="/js/plugins/jquery/jquery.min.js"></script>
+
+    <script>
+        var jj="小杰子：";
+    </script>
+
+    <script>
+        var goEasy = new GoEasy({
+            host: 'hangzhou.goeasy.io', //应用所在的区域地址: 【hangzhou.goeasy.io |singapore.goeasy.io】
+            appkey: "BC-ec1b774833544796bf343e0921008f9f", //替换为您的应用appkey
+        });
+
+
+        /* goEasy.unsubscribe ({
+             channel: "my_channel" //替换为您自己的channel
+         });*/
+
+
+    </script>
+    <style>
+        #dd{
+            background: whitesmoke;
+            border: 3px solid burlywood;
+            padding: 5px;
+        }
+
+    </style>
+
+</head>
+
+<body style="text-align: center">
+<h1 style="color: orangered">畅购客户服务</h1>
+
+<div style="text-align: center;padding-left: 300px;padding-right: 300px;padding-bottom: 30px">
+
+    <div id="dd" style="min-height: 400px;width: 100%;border-radius: 10px;padding: 10px"></div>
+
+
+    <textarea id="text" style="width: 400px;height: 50px;margin-top: 50px;outline: cyan;border: 1px solid orangered;border-radius: 5px"></textarea>
+
+    <button onclick="go()" style="width: 80px;height: 40px;background: orangered;color: white;border-radius: 5px;border: 1px solid orangered">发送</button>
+
+</div>
+
+
+
+</body>
+
+<script>
+
+    var me = jj;
+
+    goEasy.subscribe({
+        channel: "my_channel", //替换为您自己的channel
+        onMessage: function (message) {
+            console.log("Channel:" + message.channel + " content:" + message.content);
+
+            var name=message.content.split("：")[0];
+            var content=message.content.split("：")[1];
+
+            $("#dd").append("<div style='height: 40px;width: 100%;text-align: left;'>" + name+"："+"<span style='color: orangered; box-shadow: 0 0 5px lightskyblue;border-radius: 5px;border: 1px solid lightskyblue;padding: 3px'>"+content +"</div>");
+        }
+    });
+
+
+    function go() {
+        var val = $("#text").val();
+
+        goEasy.publish({
+            channel: "my_channel1", //替换为您自己的channel
+            message: me + val//替换为您想要发送的消息内容
+        });
+
+        $("#dd").append("<div style='height: 40px;width: 100%;text-align: right;'>" + "我：" + "<span style='color: cyan; box-shadow: 0 0 5px lightskyblue;border-radius: 5px;border: 1px solid lightskyblue;padding: 3px'>"+val +"</span>"+ "</div>");
+
+        $("#text").val("");
+
+    }
+
+</script>
+
+</html>

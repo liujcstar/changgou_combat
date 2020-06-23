@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- 页面meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>订单管理</title>
+    <meta name="description" content="订单管理">
+    <meta name="keywords" content="订单管理">
+    <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" name="viewport">
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="/plugins/elementui/index.css">
+    <link rel="stylesheet" href="/plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/orderset.css">
+    <!-- 引入组件库 -->
+    <script src="/js/vue.js"></script>
+    <script src="/plugins/elementui/index.js"></script>
+    <script type="text/javascript" src="/js/jquery.min.js"></script>
+    <script src="/js/axios-0.18.0.js"></script>
+</head>
+<body class="hold-transition">
+<div id="app">
+    <div class="content-header">
+        <h1>订单列表
+            <small>用户管理</small>
+        </h1>
+
+    </div>
+    <div class="app-container">
+        <div class="box">
+            <div class="filter-container">
+                收货人:
+                <el-input placeholder="收货人姓名/手机号" v-model="pagination.queryString" style="width: 150px;"
+                          class="filter-item"></el-input>
+                订单编号:
+                <el-input placeholder="订单编号" v-model="pagination.queryString2" style="width: 200px;"
+                          class="filter-item"></el-input>
+                订单状态:
+                <el-select v-model="pagination.value" clearable placeholder="订单状态">
+                    <el-option
+                            v-for="item in options"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
+                订单来源:
+                <el-select v-model="pagination.value2" clearable  placeholder="订单来源">
+                    <el-option
+                            v-for="item in options2"
+                            :key="item.value2"
+                            :label="item.label2"
+                            :value="item.value2">
+                    </el-option>
+                </el-select>
+                <el-button @click="search()" class="dalfBut">查询</el-button>
+                <el-button type="primary" class="butT" @click="exportExcal">导出Excel</el-button>
+            </div>
+            <el-table size="small" current-row-key="id" @selection-change="handleSelectionChange"  :data="dataList" stripe highlight-current-row>
+                <el-table-column type="selection" v-model="memberIds" align="center" width="55"></el-table-column>
+                <el-table-column prop="id" align="center" label="订单编号"></el-table-column>
+                <el-table-column prop="username" label="用户账号" align="center"></el-table-column>
+                <el-table-column prop="receiverContact" label="收件人" align="center"></el-table-column>
+                <el-table-column prop="receiverMobile" label="手机号" align="center"></el-table-column>
+                <el-table-column prop="payMoney" align="center" label="订单金额"></el-table-column>
+                <!--<el-table-column prop="payType" align="center" label="支付方式" ></el-table-column>-->
+                <el-table-column label="支付方式" align="center">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.payType=='0'">货到付款</span>
+                        <span v-if="scope.row.payType=='1'">在线支付</span>
+                    </template>
+                </el-table-column>
+                <!--<el-table-column prop="orderStatus" align="center" label="订单状态" ></el-table-column>-->
+                <el-table-column label="订单状态" align="center">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.orderStatus=='0'">待支付</span>
+                        <span v-if="scope.row.orderStatus=='1'">待发货</span>
+                        <span v-if="scope.row.orderStatus=='2'">待收货</span>
+                        <span v-if="scope.row.orderStatus=='3'">已完成</span>
+                        <span v-if="scope.row.orderStatus=='4'">已取消</span>
+                    </template>
+                </el-table-column>
+               <!-- <el-table-column prop="sourceType" align="center" label="订单来源" ></el-table-column>-->
+                <el-table-column label="订单来源" align="center">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.sourceType=='1'">web</span>
+                        <span v-if="scope.row.sourceType=='2'">APP</span>
+                        <span v-if="scope.row.sourceType=='3'">微信公众号</span>
+                        <span v-if="scope.row.sourceType=='4'">微信小程序</span>
+                        <span v-if="scope.row.sourceType=='5'">H5手机页面</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" align="center">
+                    <template slot-scope="scope">
+                        <el-button size="mini" @click="" round>订单详情</el-button>
+                        <el-button size="mini" @click="updateOrder(scope.row.id)" round>订单发货</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination-container">
+                <el-pagination
+                        class="pagiantion"
+                        :current-page.sync="pagination.currentPage"
+                        @current-change="handleCurrentChange"
+                        :page-size="pagination.pageSize"
+                        layout="total, prev, pager, next, jumper"
+                        :total="pagination.total"
+                        tooltip-effect="dark"
+                        @selection-change="handleSelectionChange">
+                </el-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<!-- 引入组件库 -->
+<script src="/js/vue.js"></script>
+<script src="/plugins/elementui/index.js"></script>
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script src="/js/moment.min.js"></script>
+<script th:inline="javascript">
+    var vue = new Vue({
+        el: '#app',
+        data() {
+            return {
+                activeName: 'first',//添加/编辑窗口Tab标签名称
+                pagination: {//分页相关属性
+                    currentPage: 1,
+                    pageSize: 5,
+                    total: 50,
+                    queryString: '', //收货人姓名或手机号
+                    queryString2: '', //订单编号
+                    value: '', //订单状态
+                    value2: '', //订单来源
+                },
+                options: [{
+                    value: '0',
+                    label: '待支付'
+                }, {
+                    value: '1',
+                    label: '待发货'
+                }, {
+                    value: '2',
+                    label: '待收货'
+                }, {
+                    value: '3',
+                    label: '待评价'
+                }, {
+                    value: '4',
+                    label: '订单已关闭'
+                },{
+                    value: '5',
+                    label: '已评价'
+                }],
+                options2: [{
+                    value2: '1',
+                    label2: 'web'
+                }, {
+                    value2: '2',
+                    label2: 'APP'
+                }, {
+                    value2: '3',
+                    label2: '微信公众号'
+                }, {
+                    value2: '4',
+                    label2: '微信小程序'
+                }, {
+                    value2: '5',
+                    label2: 'H5手机页面'
+                }],
+
+                dataList: [],//列表数据
+                roleIds: [],//新增和编辑表单中 角色信息 对应的复选框
+                memberIds:[],
+                menber:null,
+            }
+        },
+        created() {
+            this.findPage();
+        },
+        methods: {
+            findPage:function(){
+                let param ={
+                    currentPage : this.pagination.currentPage,
+                    pageSize : this.pagination.pageSize,
+                    queryString : this.pagination.queryString,
+                    queryString2: this.pagination.queryString2,
+                    value: this.pagination.value,
+                    value2: this.pagination.value2,
+                };
+                axios.post('/api/worder/findPage2/search2',param).then(function (response) {
+                    vue.dataList = response.data.rows;
+                    vue.pagination.total = response.data.total;
+                })
+            },
+            search(){
+                this.findPage();
+            },
+
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+
+            exportExcal(){
+                let param = vue.dataList;
+                axios.post('/api/worder/exportExcal',param, {
+                    responseType: 'blob'
+                }).then(res=>{
+                    if(res.status == 200){
+                        let blob = res.data;
+                        const fileReader = new FileReader(); // FileReader 对象允许Web应用程序异步读取存储在用户计算机上的文件的内容
+                        fileReader.readAsDataURL(blob); // 开始读取指定的Blob中的内容。一旦完成，result属性中将包含一个data: URL格式的Base64字符串以表示所读取文件的内容
+                        fileReader.onload = (event) => { // 处理load事件。该事件在读取操作完成时触发
+                            // 新建个下载的a标签，完成后移除。
+                            let a = document.createElement('a');
+                            let _fileName = '后台订单.xls';
+                            a.download = _fileName;
+                            a.href = event.target.result;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                        }
+                    }
+                })
+            },
+            //切换页码
+            handleCurrentChange(currentPage) {
+                	this.pagination.currentPage = currentPage;
+                    this.findPage();
+            },
+        }
+    })
+</script>
+</html>
